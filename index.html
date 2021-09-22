@@ -1,62 +1,110 @@
 <!DOCTYPE html>
 <html>
-
     <head>
-        <title>VNExpress</title>
-        <meta charet="utf-8">
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="style.css" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="script.js"></script>
+        <title>Do You Love Me</title>
     </head>
-
     <body>
-       <div>
-        <h1>100 người dân TP HCM tự lấy mẫu test nhanh Covid-19</h1>
-        
-        <p>Nhân viên y tế hướng dẫn khoảng 100 người dân chung cư phường Thảo Điền, TP Thủ Đức, tự lấy mẫu thực hiện test nhanh nCoV.</p>
-       
-        <img src="https://i1-suckhoe.vnecdn.net/2021/07/20/Tu-lay-mau-7736-1626780174-5609-1626782933.jpg?w=0&h=0&q=100&dpr=2&fit=crop&s=A0dwD4Hus28TBpU7RUqMjg" alt="Ảnh băng tuyết">
-       
-        <a href="https://vnexpress.net/100-nguoi-dan-tp-hcm-tu-lay-mau-test-nhanh-covid-19-4327814.html">Tới bài báo gốc</a>
-       
-        <ul>
-            <li>8 loại kit test nhanh nCoV được Bộ Y tế cấp phép</li>
-            <li>'Người dân không nên mua kit test nhanh tại nhà'</li>
-            <li>TP HCM đề xuất hỗ trợ khẩn cấp hai triệu test nhanh nCoV</li>
-        </ul>
-        
-        <table>
-            <th>Số ca Covid-19 tại Việt Nam</th>
-            <tbody>
-                <tr>
-                    <td>Tỉnh</td>
-                    <td>Hôm nay</td>
-                    <td>Tổng</td>
-                </tr>
-            
-                <tr>
-                    <td>TP HCM</td>
-                    <td>+3.322</td>
-                    <td>37.787</td>
-                </tr>
+      
+<canvas id="canvas"></canvas>
+<h1 id="loveQuestion">Do you love me?</h1>
+<input type="button" id="btnYes" value="YES" onclick="yesClick()" />
+<input type="button" id="btnNo" value="NO" onmouseover="noHover()" />
+<script>
+    /*
+Snow Effect source: https://codepen.io/longzero/pen/Kwdbyj
+*/
 
-                <tr>
-                    <td>Bình Dương</td>
-                    <td>+578</td>
-                    <td>3.725</td>
-                </tr>
+window.onload = function () {
+  //canvas init
+  var canvas = document.getElementById("canvas");
+  var ctx = canvas.getContext("2d");
 
-                <tr>
-                    <td>Đồng Nai</td>
-                    <td>+162</td>
-                    <td>1.145</td>
-                </tr></tbody>
-        </table>
-        
-        Tên đăng nhập <input type="text">
-        Mật khẩu <input type="password">
-        <input name="gender" type="radio">
-        <input name="gender" type="radio">
+  //canvas dimensions
+  var W = window.innerWidth;
+  var H = window.innerHeight;
+  canvas.width = W;
+  canvas.height = H;
 
-        <button>Sign in</button>
-       </div>
-        
+  //snowflake particles
+  var mp = 25; //max particles
+  var particles = [];
+  for (var i = 0; i < mp; i++) {
+    particles.push({
+      x: Math.random() * W, //x-coordinate
+      y: Math.random() * H, //y-coordinate
+      r: Math.random() * 4 + 1, //radius
+      d: Math.random() * mp, //density
+    });
+  }
+
+  //Lets draw the flakes
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+    ctx.beginPath();
+    for (var i = 0; i < mp; i++) {
+      var p = particles[i];
+      ctx.moveTo(p.x, p.y);
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2, true);
+    }
+    ctx.fill();
+    update();
+  }
+
+  //Function to move the snowflakes
+  //angle will be an ongoing incremental flag. Sin and Cos functions will be applied to it to create vertical and horizontal movements of the flakes
+  var angle = 0;
+  function update() {
+    angle += 0.01;
+    for (var i = 0; i < mp; i++) {
+      var p = particles[i];
+      //Updating X and Y coordinates
+      //We will add 1 to the cos function to prevent negative values which will lead flakes to move upwards
+      //Every particle has its own density which can be used to make the downward movement different for each flake
+      //Lets make it more random by adding in the radius
+      p.y += Math.cos(angle + p.d) + 1 + p.r / 2;
+      p.x += Math.sin(angle) * 2;
+
+      //Sending flakes back from the top when it exits
+      //Lets make it a bit more organic and let flakes enter from the left and right also.
+      if (p.x > W + 5 || p.x < -5 || p.y > H) {
+        if (i % 3 > 0) {
+          //66.67% of the flakes
+          particles[i] = { x: Math.random() * W, y: -10, r: p.r, d: p.d };
+        } else {
+          //If the flake is exitting from the right
+          if (Math.sin(angle) > 0) {
+            //Enter from the left
+            particles[i] = { x: -5, y: Math.random() * H, r: p.r, d: p.d };
+          } else {
+            //Enter from the right
+            particles[i] = { x: W + 5, y: Math.random() * H, r: p.r, d: p.d };
+          }
+        }
+      }
+    }
+  }
+
+  //animation loop
+  setInterval(draw, 33);
+};
+
+function yesClick() {
+  alert("Tối nay, lên hồ chơi em nhé!");
+}
+
+function noHover() {
+  var x = Math.floor(Math.random() * window.innerWidth);
+  var y = Math.floor(Math.random() * window.innerHeight);
+  document.getElementById("btnNo").style.left = x + "px";
+  document.getElementById("btnNo").style.top = y + "px";
+}
+</script>
     </body>
-</html>
+    </html>
